@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Options menu</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <section>
+      <h4>Content area (Feed pages)</h4>
+      <label>
+        <span>Max. number of columns</span>
+        <input type="number" value="5" id="maxNumOfColumns">
+        <button class="numInputBtn minus iconButton"></button>
+        <button class="numInputBtn plus iconButton"></button>
+      </label>
+      <label>
+        <span>Min. column width (px)</span>
+        <input type="number" value="450" id="minColumnWidth">
+        <button class="numInputBtn minus"></button>
+        <button class="numInputBtn plus"></button>
+      </label>
+      <label>
+        <span>Max. column width (px)</span>
+        <input type="number" value="732" id="maxColumnWidth">
+        <button class="numInputBtn minus"></button>
+        <button class="numInputBtn plus"></button>
+      </label>
+    </section>
+    <section>
+      <h4>Content area (Other pages)</h4>
+      <label>
+        <span>Max. content area width (px)</span>
+        <input type="number" value="732" id="maxContWidth">
+        <button class="numInputBtn minus"></button>
+        <button class="numInputBtn plus"></button>
+      </label>
+    </section>
+    <section>
+      <h4>Auto-hide right sidebar</h4>
+      <label>
+        <span>Everywhere</span>
+        <input type="checkbox" id="autoHideRSidebar">
+      </label>
+      <label>
+        <span>Feed pages</span>
+        <input type="checkbox" id="autoHideRSidebarFeedPages">
+      </label>
+    </section>
+  </body>
+  <script src="popup.js"></script>
+</html>

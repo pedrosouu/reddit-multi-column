@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="icon-16.png"
+   inkscape:export-xdpi="4.5528746"
+   inkscape:export-ydpi="4.5528746"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showguides="true"
+     inkscape:zoom="0.5"
+     inkscape:cx="-46"
+     inkscape:cy="785"
+     inkscape:window-width="1366"
+     inkscape:window-height="745"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient2"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ff340e;stop-opacity:1;"
+         offset="0"
+         id="stop2" />
+      <stop
+         style="stop-color:#ff8000;stop-opacity:1;"
+         offset="1"
+         id="stop4" />
+    </linearGradient>
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect5"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect4"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2"
+       id="linearGradient5"
+       x1="23.198996"
+       y1="158.37572"
+       x2="113.199"
+       y2="158.37572"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(36.801,-9.8757195)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect2"
+       style="fill:url(#linearGradient5);stroke-width:0.330049"
+       d="M 79.999768 103.50014 C 68.919768 103.50014 59.999955 112.41996 59.999955 123.49996 L 59.999955 151.16752 L 100.49981 151.16752 L 100.49981 103.50014 L 79.999768 103.50014 z M 109.49978 103.50014 L 109.49978 134.9189 L 150.00015 134.9189 L 150.00015 123.49996 C 150.00015 112.41996 141.07982 103.50014 129.99982 103.50014 L 109.49978 103.50014 z M 109.49978 143.91886 L 109.49978 193.49982 L 129.99982 193.49982 C 141.07982 193.49982 150.00015 184.58 150.00015 173.5 L 150.00015 143.91886 L 109.49978 143.91886 z M 59.999955 160.16748 L 59.999955 173.5 C 59.999955 184.58 68.919768 193.49982 79.999768 193.49982 L 100.49981 193.49982 L 100.49981 160.16748 L 59.999955 160.16748 z "
+       inkscape:export-filename="icon-48.png"
+       inkscape:export-xdpi="13.546638"
+       inkscape:export-ydpi="13.546638" />
+  </g>
+</svg>

@@ -1,0 +1,82 @@
+@media (min-width: 768px) {
+    :root {
+        --rmc-gap: 2rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    :root {
+        --rmc-gap: 3rem;
+        --rmc-left-sidebar: 32px;
+    }
+    
+    .flex-nav-expanded {
+        --rmc-left-sidebar: 272px
+    }
+}
+
+@media (min-width: 960px) {
+    :root:not(.rmc-auto-hide-r-sidebar, .rmc-feed-page.rmc-auto-hide-r-sidebar-feed-pages) {
+        --rmc-right-sidebar: 316px;
+        --rmc-right-sidebar-gap: 1.5rem;
+        --rmc-minmax: minmax(0, 1fr) minmax(0, var(--rmc-right-sidebar));
+    }
+}
+
+[class*="minmax\(0\2c 316px"] {
+    grid-template-columns: var(--rmc-minmax, minmax(0, 1fr)) !important;
+}
+
+:root.rmc-feed-page .subgrid-container {
+    width: calc(100vw - var(--flex-nav-width, 0px)) !important;
+    max-width: calc((var(--rmc-columns)*var(--rmc-max-column-width)) + var(--rmc-right-sidebar, 0px) + var(--rmc-right-sidebar-gap, 0px) + var(--rmc-gap, 0px)) !important;
+    transition: initial !important;
+}
+
+:root:not(.rmc-feed-page) .subgrid-container {
+    width: calc(100vw - var(--flex-nav-width, 0px)) !important;
+    max-width: calc((1*var(--rmc-max-cont-width)) + var(--rmc-right-sidebar, 0px) + var(--rmc-right-sidebar-gap, 0px) + var(--rmc-gap, 0px)) !important;
+    transition: initial !important;
+}
+
+:root:is(.rmc-auto-hide-r-sidebar, .rmc-feed-page.rmc-auto-hide-r-sidebar-feed-pages) #right-sidebar-container {
+    position: fixed;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    max-height: initial;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 999;
+    padding-left: 1.5rem;
+    transform: translateX(calc(100% - 1.5rem));
+    transition: transform 0.3s ease;
+    scrollbar-width: thin;
+}
+
+:root:is(.rmc-auto-hide-r-sidebar, .rmc-feed-page.rmc-auto-hide-r-sidebar-feed-pages) #right-sidebar-container:hover {
+    transform: translateX(0);
+}
+
+:root:is(.rmc-auto-hide-r-sidebar, .rmc-feed-page.rmc-auto-hide-r-sidebar-feed-pages) #right-sidebar-container .legal-links,
+shreddit-ad-post {
+    display: none !important;
+}
+
+.flex-grid--main-container-card,
+.main-container {
+    max-width: initial !important;
+}
+
+shreddit-feed.nd\:visible:not(:defined) {
+    display: block !important;
+}
+
+article[style] + hr {
+    border-color: transparent;
+}
+
+/* Tries to fix the grid acting weird when scrolling up (does not appear to happen in subreddits) */
+shreddit-feed[style]:not(.rmc-has-batch) .virtualized-placeholder {
+    position: absolute;
+}
