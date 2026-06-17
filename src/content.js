@@ -1,216 +1,217 @@
+document.addEventListener('rmcStorageData', function(e) {
+const div = document.createElement('div');
+div.style = 'width: calc(100vw - var(--rmc-left-sidebar, 0px) - var(--rmc-gap, 0px) - var(--rmc-right-sidebar, 0px) - var(--rmc-right-sidebar-gap, 0px))';
 
-chrome.storage.sync.get().then(function(settings) {
-    const div = document.createElement('div');
-    div.style = 'width: calc(100vw - var(--rmc-left-sidebar, 0px) - var(--rmc-gap, 0px) - var(--rmc-right-sidebar, 0px) - var(--rmc-right-sidebar-gap, 0px))';
+document.documentElement.style.setProperty('--rmc-max-column-width', (e.detail.maxColumnWidth || 732) + 'px');
+document.documentElement.style.setProperty('--rmc-max-cont-width', (e.detail.maxContWidth || 732) + 'px');
+if (e.detail.autoHideRSidebar) document.documentElement.classList.add('rmc-auto-hide-r-sidebar');
+if (e.detail.autoHideRSidebarFeedPages) document.documentElement.classList.add('rmc-auto-hide-r-sidebar-feed-pages');
 
-    document.documentElement.style.setProperty('--rmc-max-column-width', (settings.maxColumnWidth || 732) + 'px');
-    document.documentElement.style.setProperty('--rmc-max-cont-width', (settings.maxContWidth || 732) + 'px');
-    if (settings.autoHideRSidebar) document.documentElement.classList.add('rmc-auto-hide-r-sidebar');
-    if (settings.autoHideRSidebarFeedPages) document.documentElement.classList.add('rmc-auto-hide-r-sidebar-feed-pages');
-
-    let numOfColumns, width, postsContainer, app;
-    let maxNumOfColumns = settings.maxNumOfColumns || 5;
-    let minColumnWidth = settings.minColumnWidth || 450;
-    let heights = [];
-    let heights2 = [];
-    let observer = new MutationObserver(function () {
-        requestAnimationFrame(addPostsToArray);
+let numOfColumns, width, postsContainer, app;
+let maxNumOfColumns = e.detail.maxNumOfColumns || 5;
+let minColumnWidth = e.detail.minColumnWidth || 450;
+let heights = [];
+let heightsBatch = [];
+let observer = new MutationObserver(function (e) {
+    requestAnimationFrame(function () {
+        addPostsToArray(e);
     });
+});
 
-    window.addEventListener('popstate', function() {
-        requestAnimationFrame(handlePageNav);
-    });
+new MutationObserver(function () {
+    if (document.querySelector('shreddit-feed')) {
+        this.disconnect();
+        handlePageNav();
+    }
+}).observe(document.documentElement, {
+    childList: true,
+    subtree: true
+});
 
-    new MutationObserver(function () {
-        if (document.querySelector('shreddit-feed')) {
-            this.disconnect();
-            handlePageNav();
+document.addEventListener = function () {
+    if (arguments[0] == 'scroll') handlePageNav();
+    HTMLDocument.prototype.addEventListener.apply(document, arguments);
+}
 
-            new MutationObserver(function () {
-                handlePageNav();
-            }).observe(document.querySelector('title'), {
-                childList: true
-            });
-            
-            let nav = document.body.querySelector('navigation-indicator');
-            const observer = new ResizeObserver(function (e) {
-                if (!e[0].contentRect.height) requestAnimationFrame(handlePageNav);
-            });
+document.removeEventListener = function () {
+    if (arguments[0] == 'scroll') handlePageNav();
+    HTMLDocument.prototype.removeEventListener.apply(document, arguments);
+}
 
-            if (nav) observer.observe(nav); 
-            else {
-                new MutationObserver(function () {
-                    let nav = document.body.querySelector('navigation-indicator');
-                    if (nav) observer.observe(nav);
-                }).observe(document.body, {
-                    childList: true
-                });
+function handlePageNav() {
+    if (!postsContainer?.isConnected && (postsContainer = document.body.querySelector('shreddit-app:not([routename^="profile"]):not([routename="explore-page"]) shreddit-feed'))) {
+        document.documentElement.classList.add('rmc-feed-page');
+
+        observer.disconnect();
+        observer.observe(postsContainer, {
+            childList: true
+        });
+
+        if (!div.isConnected) {
+            postsContainer.after(div);
+            if (!numOfColumns) columns();
+            if (!postsContainer.posts) {
+                postsContainer.style.position = 'relative';
+                postsContainer.posts = [];
             }
         }
-    }).observe(document.documentElement, {
-        childList: true,
-        subtree: true
-    });
 
-    function addPostsToArray() {
-        const posts = postsContainer.querySelectorAll(':is(article, in-feed-wiki-page-carousel, in-feed-community-recommendations):not([style])');
-        if (!posts.length) return;
-        for (let i = 0; i < posts.length; i++) {
-            postsContainer.posts.push(posts[i]);
-        }
-        arrangePosts();
+        requestAnimationFrame(addPostsToArray);
+    } else if (!postsContainer) document.documentElement.classList.remove('rmc-feed-page');
+}
+
+function addPostsToArray(entries) {
+    const newPosts = postsContainer.querySelectorAll(':is(article, in-feed-wiki-page-carousel, in-feed-community-recommendations):not([style])');
+    if (!newPosts.length) return;
+
+    // All the old posts were removed
+    if (entries[0]?.removedNodes.length > 1) postsContainer.posts = [];
+
+    for (let i = 0; i < newPosts.length; i++) {
+        postsContainer.posts.push(newPosts[i]);
     }
 
-    function arrangePosts() {
-        let post, shortestCol;
-        for (let i = 0; i < postsContainer.posts.length; i++) {
-            post = postsContainer.posts[i];
-            shortestCol = post.attributes.column?.value || getShortestCol(heights);
+    arrangePosts();
+}
 
-            if (post.isConnected) {
-                post.style = `position: absolute; width: var(--rmc-post-width); left: ${width * shortestCol}%; top: ${heights[shortestCol]}px; box-sizing: border-box;`;
-                heights[shortestCol] += post.offsetHeight;
-                post.setAttribute('height', post.offsetHeight);
-                post.setAttribute('column', shortestCol);
-                if (!post.parentElement.posts) {
-                    heights2[getShortestCol(heights2)] += post.offsetHeight;
-                    if (!post.nextElementSibling?.nextElementSibling) {
-                        postsContainer.classList.add('rmc-has-batch');
-                        post.parentElement.style.minHeight = Math.max(...heights2) + 'px';
-                        for (let i = 0; i < heights2.length; i++) {
-                            heights2[i] = 0;
-                        }
+function arrangePosts() {
+    let post, shortestCol;
+    for (let i = 0; i < postsContainer.posts.length; i++) {
+        post = postsContainer.posts[i];
+        shortestCol = post.column ?? getShortestCol(heights);
+
+        if (post.isConnected) {
+            post.style = `
+                position: absolute; 
+                width: var(--rmc-post-width); 
+                left: ${width * shortestCol}%; 
+                top: ${heights[shortestCol]}px; 
+                box-sizing: border-box;
+                `;
+            heights[shortestCol] += post.offsetHeight;
+            post.height = post.offsetHeight;
+            post.column = shortestCol;
+            if (!post.parentElement.posts) {
+                heightsBatch[getShortestCol(heightsBatch)] += post.offsetHeight;
+                if (!post.nextElementSibling?.nextElementSibling) {
+                    postsContainer.classList.add('rmc-has-batch');
+                    post.parentElement.style.minHeight = Math.max(...heightsBatch) + 'px';
+                    for (let i = 0; i < heightsBatch.length; i++) {
+                        heightsBatch[i] = 0;
                     }
                 }
-            } else {
-                heights[shortestCol] += +post.attributes.height.value;
             }
-        }        
-
-        const loadMorePostsEl = getLoadMorePostsEl();
-
-        if (loadMorePostsEl) {
-            shortestCol = getShortestCol(heights);
-            loadMorePostsEl.style = `position: absolute; width: var(--rmc-post-width); left: ${width * shortestCol}%; top: ${heights[shortestCol]}px;`;
-            postsContainer.style.height = Math.max(...heights) + loadMorePostsEl.offsetHeight + 'px';
         } else {
-            postsContainer.style.height = Math.max(...heights) + 'px';
-        }
-        for (let i = 0; i < heights.length; i++) {
-            heights[i] = 0;
+            heights[shortestCol] += post.height;
         }
     }
 
-    function getLoadMorePostsEl() {
-        let el = postsContainer.lastElementChild; 
-        if (el.attributes.method) return el;
+    const loadMorePostsEl = getLoadMorePostsEl();
 
-        for (let i = 0; i < 5; i++) {
-            if (el?.attributes.method) return el;
-            else if (el) el = el.previousElementSibling;
-            else break;
+    if (loadMorePostsEl) {
+        shortestCol = getShortestCol(heights);
+        loadMorePostsEl.style = `
+            position: absolute; 
+            width: var(--rmc-post-width); 
+            left: ${width * shortestCol}%; 
+            top: ${heights[shortestCol]}px;
+            `;
+        postsContainer.style.height = Math.max(...heights) + loadMorePostsEl.offsetHeight + 'px';
+    } else {
+        postsContainer.style.height = Math.max(...heights) + 'px';
+    }
+    for (let i = 0; i < heights.length; i++) {
+        heights[i] = 0;
+    }
+}
+
+function getLoadMorePostsEl() {
+    let el = postsContainer.lastElementChild;
+    if (el.attributes.method) return el;
+
+    for (let i = 0; i < 5; i++) {
+        if (el?.attributes.method) return el;
+        else if (el) el = el.previousElementSibling;
+        else break;
+    }
+}
+
+function calcNumOfColumns() {
+    for (let i = maxNumOfColumns; i > 0; i--) {
+        if (div.clientWidth / i >= minColumnWidth) {
+            document.documentElement.style.setProperty('--rmc-columns', i);
+            return i;
         }
     }
-    
-    function calcNumOfColumns() {
-        for (let i = maxNumOfColumns; i > 0; i--) {
-            if (div.clientWidth / i >= minColumnWidth) {
-                document.documentElement.style.setProperty('--rmc-columns', i);
-                return i;
-            }
+}
+
+function getShortestCol(array) {
+    let column = 0;
+    for (let i = 1; i < array.length; i++) {
+        if (array[column] > array[i]) {
+            column = i;
         }
     }
+    return column;
+}
 
-    function getShortestCol(array) {
-        let column = 0;
-        for (let i = 1; i < array.length; i++) {
-            if (array[column] > array[i]) {
-                column = i;
-            }
+function handlePageResize() {
+    if (calcNumOfColumns() != numOfColumns) {
+        columns();
+        for (let i = 0; i < postsContainer.posts.length; i++) {
+            delete postsContainer.posts[i].column;
         }
-        return column;
-    }
-
-    function handlePageNav() {
-        if (!postsContainer?.isConnected && (postsContainer = document.body.querySelector('shreddit-app:not([routename^="profile"]):not([routename="explore-page"]) shreddit-feed'))) {
-            document.documentElement.classList.add('rmc-feed-page');
-
-            observer.disconnect();
-            observer.observe(postsContainer, { 
-                childList: true 
-            });
-
-            if (!div.isConnected) {
-                postsContainer.after(div);
-                if (!numOfColumns) columns();
-                if (!postsContainer.posts) {
-                    postsContainer.style.position = 'relative';
-                    postsContainer.posts = [];
-                }
-            }
-
-            requestAnimationFrame(addPostsToArray);
-        } else if (!postsContainer) document.documentElement.classList.remove('rmc-feed-page');
-    }
-    
-    function handlePageResize() {
-        if (calcNumOfColumns() != numOfColumns) {
-            columns();
-            for (let i = 0; i < postsContainer.posts.length; i++) {
-                postsContainer.posts[i].removeAttribute('column');
-            }
-            arrangePosts();
-        } else {
-            document.documentElement.style.setProperty('--rmc-post-width', postsContainer.clientWidth / numOfColumns + 'px');
-        }
-    }
-
-    function columns() {
-        numOfColumns = calcNumOfColumns() || 1;
+        arrangePosts();
+    } else {
         document.documentElement.style.setProperty('--rmc-post-width', postsContainer.clientWidth / numOfColumns + 'px');
-        width = 100 / numOfColumns;
-        heights = [];
-        heights2 = [];
-        for (let i = 0; i < numOfColumns; i++) {
-            heights.push(0);
-            heights2.push(0); 
-        }
+    }
+}
+
+function columns() {
+    numOfColumns = calcNumOfColumns() || 1;
+    document.documentElement.style.setProperty('--rmc-post-width', postsContainer.clientWidth / numOfColumns + 'px');
+    width = 100 / numOfColumns;
+    heights = [];
+    heightsBatch = [];
+    for (let i = 0; i < numOfColumns; i++) {
+        heights.push(0);
+        heightsBatch.push(0);
+    }
+}
+
+new ResizeObserver(function () {
+    if (postsContainer?.isConnected) requestAnimationFrame(handlePageResize);
+}).observe(div);
+
+window.addEventListener('scrollend', function () {
+    if (postsContainer?.isConnected) requestAnimationFrame(arrangePosts);
+});
+
+document.addEventListener('rmcStorageChanged', function (e) {
+    if (e.detail.minColumnWidth) {
+        minColumnWidth = e.detail.minColumnWidth.newValue;
     }
 
-    new ResizeObserver(function() {
-        if (postsContainer?.isConnected) requestAnimationFrame(handlePageResize);
-    }).observe(div);
-    
-    window.addEventListener('scrollend', function() { 
-        if (postsContainer?.isConnected) requestAnimationFrame(arrangePosts);
-    });
-    
-    chrome.storage.onChanged.addListener(function(changes) {
-        if (changes.minColumnWidth) {
-            minColumnWidth = changes.minColumnWidth.newValue;
-        } 
-        
-        else if (changes.maxNumOfColumns) {
-            maxNumOfColumns = changes.maxNumOfColumns.newValue;
-        } 
-        
-        else if (changes.maxColumnWidth) {
-            document.documentElement.style.setProperty('--rmc-max-column-width', changes.maxColumnWidth.newValue + 'px');
-        } 
-        
-        else if (changes.maxContWidth) {
-            document.documentElement.style.setProperty('--rmc-max-cont-width', changes.maxContWidth.newValue + 'px');
-        } 
-        
-        else if (changes.autoHideRSidebar) {
-            document.documentElement.classList.toggle('rmc-auto-hide-r-sidebar');
-        }
+    if (e.detail.maxNumOfColumns) {
+        maxNumOfColumns = e.detail.maxNumOfColumns.newValue;
+    }
 
-        else if (changes.autoHideRSidebarFeedPages) {
-            document.documentElement.classList.toggle('rmc-auto-hide-r-sidebar-feed-pages');
-        }
+    if (e.detail.maxColumnWidth) {
+        document.documentElement.style.setProperty('--rmc-max-column-width', e.detail.maxColumnWidth.newValue + 'px');
+    }
 
+    if (e.detail.maxContWidth) {
+        document.documentElement.style.setProperty('--rmc-max-cont-width', e.detail.maxContWidth.newValue + 'px');
+    }
 
-        handlePageResize();
-    });
+    if (e.detail.autoHideRSidebar) {
+        document.documentElement.classList.toggle('rmc-auto-hide-r-sidebar');
+    }
+
+    if (e.detail.autoHideRSidebarFeedPages) {
+        document.documentElement.classList.toggle('rmc-auto-hide-r-sidebar-feed-pages');
+    }
+
+    handlePageResize();
+});
 });

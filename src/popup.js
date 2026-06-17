@@ -3,25 +3,35 @@ let intervalId;
 chrome.storage.sync.get().then(function(result) {
     for (const key in result) {
         const el = document.getElementById(key);
-        if (el?.type === 'checkbox') el.checked = result[key];
+        if (el?.type == 'checkbox') el.checked = result[key];
         else if (el) el.value = result[key];
     }
 });
 
-function savePreference(target) {
-    chrome.storage.sync.set({
-        [target.id]: target.type === 'checkbox' ? target.checked : target.value
-    });
+function storeSetting(setting) {
+    chrome.storage.sync.set(setting);
 }
 
 document.addEventListener('change', function(e) {
-    savePreference(e.target);
+    const setting = {};
+    const isCheckbox = e.target.type == 'checkbox';
+    setting[e.target.id] = isCheckbox ? e.target.checked : e.target.value;
+
+    if (isCheckbox) {
+        const checkbox = document.querySelector('[type="checkbox"]:checked:not(:focus)');
+        if (checkbox) {
+            setting[checkbox.id] = false;
+            checkbox.checked = false;
+        }
+    }
+
+    storeSetting(setting);
 });
 
 document.addEventListener('mousedown', function(e) {
-    if(e.target.classList[0] === 'numInputBtn') {
+    if(e.target.classList[0] == 'numInputBtn') {
         const input = e.target.closest('label').children[1];
-        if (e.target.classList[1] === 'plus') {
+        if (e.target.classList[1] == 'plus') {
             input.stepUp();
             intervalId = setTimeout(function() {
                 intervalId = setInterval(function() {
@@ -41,7 +51,7 @@ document.addEventListener('mousedown', function(e) {
 
 document.addEventListener('mouseup', function(e) {
     clearInterval(intervalId);
-    if (e.target.classList[0] === 'numInputBtn') {
-        savePreference(e.target.closest('label').children[1]);
+    if (e.target.classList[0] == 'numInputBtn') {
+        storeSetting(e.target.closest('label').children[1]);
     }
 });

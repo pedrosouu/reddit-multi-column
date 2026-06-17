@@ -59,7 +59,8 @@
 }
 
 :root:is(.rmc-auto-hide-r-sidebar, .rmc-feed-page.rmc-auto-hide-r-sidebar-feed-pages) #right-sidebar-container .legal-links,
-shreddit-ad-post {
+shreddit-ad-post,
+shreddit-feed.nd\:visible:not(:defined) [slot='loader'] {
     display: none !important;
 }
 
