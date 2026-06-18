@@ -49,9 +49,10 @@ document.addEventListener('mousedown', function(e) {
     }
 });
 
-document.addEventListener('mouseup', function(e) {
+document.addEventListener('mouseup', function (e) {
     clearInterval(intervalId);
     if (e.target.classList[0] == 'numInputBtn') {
-        storeSetting(e.target.closest('label').children[1]);
+        const input = e.target.closest('label').children[1];
+        storeSetting({ [input.id]: input.value });
     }
 });
