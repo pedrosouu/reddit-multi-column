@@ -47,13 +47,11 @@ function handlePageNav() {
             childList: true
         });
 
-        if (!div.isConnected) {
-            postsContainer.after(div);
-            if (!numOfColumns) columns();
-            if (!postsContainer.posts) {
-                postsContainer.style.position = 'relative';
-                postsContainer.posts = [];
-            }
+        if (!div.isConnected) postsContainer.after(div);
+        if (!numOfColumns) columns();
+        if (!postsContainer.posts) {
+            postsContainer.style.position = 'relative';
+            postsContainer.posts = [];
         }
 
         requestAnimationFrame(addPostsToArray);

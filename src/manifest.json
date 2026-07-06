@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Reddit Multi-Column",
     "description": "Displays posts in multiple columns.",
-    "version": "2026.6.18",
+    "version": "2026.7.6",
     "icons": {
         "16": "icons/icon-16.png",
         "32": "icons/icon-32.png",
